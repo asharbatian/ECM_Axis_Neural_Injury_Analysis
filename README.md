@@ -28,8 +28,6 @@ This analysis validates whether these ECM axes—particularly the Hyaluronan axi
 | Samples | n = 63 (31 implant, 32 control) |
 | Timepoints | Day 0 (4h), 7, 14, 28, 126 |
 
-The paired design (implant and control from the same animal) increases statistical power by controlling for inter-animal variability.
-
 ## Repository Structure
 
 ```
