@@ -70,19 +70,6 @@ install.packages(c("tidyverse", "patchwork", "pheatmap"))
 
 ### Execution
 
-```bash
-cd "/path/to/HA Manuscript"
-bash analysis/run_analysis.sh
-```
-
-Or run scripts individually:
-
-```bash
-Rscript analysis/scripts/01_data_processing.R
-Rscript analysis/scripts/02_annotation_mapping.R
-# ... etc
-```
-
 Scripts must be run in order (01 → 08) as each depends on outputs from previous scripts.
 
 ## Data Requirements
