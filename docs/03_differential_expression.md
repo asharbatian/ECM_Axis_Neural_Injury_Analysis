@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Performs paired differential expression analysis between implant and control samples at each timepoint using the `limma` framework.
+Performs differential expression analysis between implant and control samples at each timepoint using the `limma` framework.
 
 ## Input
 
@@ -35,8 +35,6 @@ Performs paired differential expression analysis between implant and control sam
 ## Methods
 
 ### Statistical Model
-
-**Design**: Paired comparison with blocking by animal ID
 
 ```r
 # Design matrix
