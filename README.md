@@ -4,7 +4,7 @@
 
 Neural implants trigger a foreign body response (FBR) that can compromise device performance over time. Understanding the molecular dynamics of this response is critical for developing biocompatible neural interfaces.
 
-Previous work analyzing brain injury (BI) and spinal cord injury (SCI) transcriptomics identified six extracellular matrix (ECM) axes that define tissue remodeling phases:
+Analysis of brain injury (BI) and spinal cord injury (SCI) transcriptomics identified six extracellular matrix (ECM) axes that define tissue remodeling phases:
 
 | Axis | Function |
 |------|----------|
