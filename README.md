@@ -121,10 +121,10 @@ Scripts must be run in order (01 → 08) as each depends on outputs from previou
 
 ## Outputs
 
-### Main Figure
-- `figures/main/Figure_Main.pdf` — 6-panel figure
+### Main Figure plots
+- `figures/individual/` -  individual plots from each script
 
-### Supplementary Figures
+### Supplementary Figure plots
 - `figures/supplementary/` — QC, all axes, GSEA heatmaps
 
 ### Data Tables
