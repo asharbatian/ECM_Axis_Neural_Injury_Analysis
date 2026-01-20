@@ -1,4 +1,4 @@
-# 06_module_preservation.R
+# scripts/06_module_preservation.R
 
 ## Purpose
 
@@ -26,6 +26,17 @@ Tests whether WGCNA co-expression modules from brain injury (BI) and spinal cord
 | `figures/06_key_module_trajectories.pdf` | Module eigengene trajectories |
 | `figures/06_module_preservation_bar.pdf` | Bar plot of significant timepoints per module |
 
+## Interpretation (for readers)
+
+- **What this step answers**: “Do known injury-related gene programs (modules) also show activity changes after implantation?”
+- **Open first**:
+  - `results/preservation/module_preservation_summary.csv` (which modules are consistently affected)
+  - `figures/06_key_module_trajectories.pdf` (how module activity evolves over time)
+- **How to interpret it**:
+  - A “module” is a **gene program**; its “eigengene” is a single summary value representing overall module activity per sample.
+  - If inflammatory/ECM modules change in implant vs control, it supports shared biology with BI/SCI responses.
+- **Important note**: these modules are manuscript-derived summaries; interpret them as “program-level concordance,” not a definitive causal mechanism.
+
 ## Methods
 
 ### Module Eigengene Calculation
@@ -48,14 +59,7 @@ calculate_eigengene <- function(expr_matrix, module_genes) {
 
 ### Statistical Testing
 
-Limma paired design comparing eigengenes between conditions:
-
-```r
-fit <- lmFit(module_eigengenes, design, block = metadata$animal_id,
-             correlation = corfit$consensus)
-fit2 <- contrasts.fit(fit, contrasts)
-fit2 <- eBayes(fit2)
-```
+Module eigengenes are compared between conditions using an **unpaired** test within each timepoint (implant vs control; independent samples).
 
 ### Preservation Criterion
 

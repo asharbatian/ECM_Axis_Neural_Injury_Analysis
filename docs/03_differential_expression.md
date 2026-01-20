@@ -1,4 +1,4 @@
-# 03_differential_expression.R
+# scripts/03_differential_expression.R
 
 ## Purpose
 
@@ -32,14 +32,25 @@ Performs differential expression analysis between implant and control samples at
 | `figures/supplementary/03_volcano_all_timepoints.pdf` | Combined volcano plot |
 | `figures/individual/03_deg_trajectory.pdf` | DEG count over time |
 
+## Interpretation (for readers)
+
+- **What this step answers**: “Which genes change after implantation (vs contralateral control) at each timepoint?”
+- **Open first**:
+  - `results/deg/deg_summary.csv` (how many genes change over time)
+  - `results/deg/deg_significant_Week*.csv` (the actual gene lists)
+- **How to interpret key columns**:
+  - **`logFC`** > 0: higher expression in **implant**; **`logFC`** < 0: higher in **control**
+  - **`adj.P.Val` (FDR)** < 0.05: statistically supported change after multiple-testing correction
+- **Paper-friendly reading**: the DEG trajectory over time tells you whether the response is strongest acutely, resolves, or persists into the chronic timepoint.
+
 ## Methods
 
-### Statistical Model
+### Statistical Model (unpaired)
 
 ```r
 # Design matrix
 design <- model.matrix(~ 0 + group, data = metadata)
-# where group = condition:timepoint interaction
+# where group = condition:timepoint interaction (independent samples)
 
 # Contrasts: Implant - Control at each timepoint
 contrasts <- makeContrasts(
@@ -48,10 +59,8 @@ contrasts <- makeContrasts(
   ...
 )
 
-# Account for paired design
-corfit <- duplicateCorrelation(expr, design, block = metadata$animal_id)
-fit <- lmFit(expr, design, block = metadata$animal_id, 
-             correlation = corfit$consensus)
+# Fit limma model (unpaired)
+fit <- lmFit(expr, design)
 ```
 
 ### Significance Criteria

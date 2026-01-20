@@ -1,4 +1,4 @@
-# 01_data_processing.R
+# scripts/01_data_processing.R
 
 ## Purpose
 
@@ -38,6 +38,17 @@ Data/arrays/
 | File | Description |
 |------|-------------|
 | `figures/01_pca_all_samples.pdf` | PCA plot colored by condition and timepoint |
+
+## Interpretation (for readers)
+
+- **What this step answers**: “Did the samples behave sensibly after normalization?” (i.e., no obvious outliers driving biology).
+- **Open first**: `figures/01_pca_all_samples.pdf`
+- **How to read it**:
+  - Samples that cluster mainly by **timepoint** and/or **condition** are expected; a single sample far away from all others may be an outlier.
+  - If implant/control pairs look systematically separated within the same timepoint, that supports a biological implant effect.
+- **Key outputs for downstream steps**:
+  - `results/expr_matrix_normalized.rds`: the normalized expression values used for all later analyses
+  - `results/sample_metadata.csv`: defines which samples are implant vs control and how they pair across conditions
 
 ## Methods
 

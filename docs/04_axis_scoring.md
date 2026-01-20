@@ -1,4 +1,4 @@
-# 04_axis_scoring.R
+# scripts/04_axis_scoring.R
 
 ## Purpose
 
@@ -31,6 +31,17 @@ Calculates single-sample enrichment scores (ssGSEA) for each ECM axis to quantif
 | `figures/04_axis_ranking_acute.pdf` | Axis ranking at peak response |
 | `figures/supplementary/04_method_comparison.pdf` | ssGSEA vs z-score comparison |
 
+## Interpretation (for readers)
+
+- **What this step answers**: “At the pathway/axis level, which ECM programs are most activated by implantation?”
+- **Open first**:
+  - `figures/04_axis_trajectories.pdf` (axis scores over time)
+  - `results/axis_scoring/axis_activation_stats.csv` (statistics supporting differences)
+- **How to interpret key columns**:
+  - **`logFC`** > 0: higher axis score in **implant** vs control at that timepoint
+  - **`adj.P.Val` (FDR)** < 0.05: statistically supported axis activation
+- **Biological intuition**: axes summarize coordinated behavior of multiple genes, which can be more robust and interpretable than single-gene DEGs.
+
 ## Methods
 
 ### ssGSEA Algorithm
@@ -43,7 +54,7 @@ library(GSVA)
 gsva_params <- ssgseaParam(
   exprData = expr_gene,
   geneSets = ecm_axes,
-  minSize = 5,
+  minSize = 3,
   maxSize = 500
 )
 
@@ -51,18 +62,15 @@ ssgsea_scores <- gsva(gsva_params)
 ```
 
 **Parameters**:
-- `kcdf = "Gaussian"` — Kernel for empirical CDF (appropriate for microarray)
-- `minSize = 5` — Minimum gene set size
+- `minSize = 3` — Minimum gene set size
 - `maxSize = 500` — Maximum gene set size
 
 ### Statistical Testing
 
-Enrichment scores compared between conditions using limma (same paired design as DEG analysis):
+Enrichment scores compared between conditions using an unpaired limma design (implant vs control, independent samples):
 
 ```r
-# Same design as script 03
-fit <- lmFit(ssgsea_scores, design, block = metadata$animal_id,
-             correlation = corfit$consensus)
+fit <- lmFit(ssgsea_scores, design)
 fit2 <- contrasts.fit(fit, contrasts)
 fit2 <- eBayes(fit2)
 

@@ -1,4 +1,4 @@
-# 07_pathway_enrichment.R
+# scripts/07_pathway_enrichment.R
 
 ## Purpose
 
@@ -7,32 +7,45 @@ Performs fast gene set enrichment analysis (fGSEA) on ranked gene lists to test 
 ## Input
 
 | File | Source |
-|------|--------|
-| `results/expr_gene_level.rds` | Script 02 |
-| `results/sample_metadata.csv` | Script 01 |
-| `results/deg/limma_fit.rds` | Script 03 |
+| --- | --- |
+| `results/deg/deg_results_list.rds` | Script 03 |
 | `results/reference/ecm_axes_rat.rds` | Script 02 |
 
 ## Output
 
 ### Data Files
+
 | File | Description |
-|------|-------------|
+| --- | --- |
 | `results/ha_analysis/gsea_all_results.csv` | All pathway enrichment results |
 | `results/ha_analysis/go_enrichment_*.csv` | GO enrichment for peak timepoint |
 | `results/ha_analysis/upstream_regulator_results.rds` | Full results object |
 
 ### Figures
+
 | File | Description |
-|------|-------------|
-| `figures/individual/11_gsea_heatmap.pdf` | NES heatmap across timepoints |
-| `figures/individual/11_ha_pathway_trajectory.pdf` | HA pathway scores over time |
+| --- | --- |
+| `figures/individual/07_gsea_heatmap.pdf` | NES heatmap across timepoints |
+| `figures/individual/07_ha_pathway_trajectory.pdf` | HA pathway NES over time |
+
+## Interpretation (for readers)
+
+- **What this step answers**: “Are whole pathways/gene sets (ECM axes, HA-related signaling, literature signatures) enriched after implantation?”
+- **Open first**:
+  - `results/ha_analysis/gsea_all_results.csv` (all enrichment results)
+  - `figures/individual/07_gsea_heatmap.pdf` (quick overview across time)
+- **How to interpret key columns**:
+  - **NES** > 0: gene set is enriched among genes higher in **implant** (relative to control)
+  - **NES** < 0: enriched among genes higher in **control**
+  - **padj (FDR)** < 0.05: statistically supported enrichment after multiple testing correction
+- **Biological value**: enrichment helps connect many modest gene changes into a coherent biological mechanism/signature.
 
 ## Methods
 
 ### Gene Ranking
 
 Genes ranked by signed significance:
+
 ```r
 rank_stat <- sign(logFC) * -log10(P.Value)
 ranked_genes <- sort(rank_stat, decreasing = TRUE)
@@ -55,7 +68,7 @@ fgsea_results <- fgsea(
 ### Gene Sets Tested
 
 | Gene Set | Source | N Genes |
-|----------|--------|---------|
+| --- | --- | --- |
 | Hyaluronan | Manuscript Table 1 | 12 |
 | Provisional_Matrix | Manuscript Table 1 | 8 |
 | PNN_CSPG | Manuscript Table 1 | 10 |
@@ -70,8 +83,9 @@ fgsea_results <- fgsea(
 ## Output Columns
 
 ### gsea_all_results.csv
+
 | Column | Description |
-|--------|-------------|
+| --- | --- |
 | pathway | Gene set name |
 | pval | Nominal p-value |
 | padj | BH-adjusted p-value |

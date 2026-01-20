@@ -1,4 +1,4 @@
-# 02_annotation_mapping.R
+# scripts/02_annotation_mapping.R
 
 ## Purpose
 
@@ -26,6 +26,15 @@ Maps Affymetrix probe IDs to gene symbols and creates gene-level expression matr
 | `results/reference/mouse_rat_orthologs.csv` | Mouse-to-rat gene symbol mapping |
 | `results/reference/ortholog_mapping_summary.csv` | Mapping success rates per axis |
 | `results/reference/probe_annotations.csv` | Full probe-to-gene annotation table |
+
+## Interpretation (for readers)
+
+- **What this step answers**: “Are we measuring genes (not probes), and do we have the ECM axis gene lists in the same species as the data?”
+- **Open first**: `results/reference/ortholog_mapping_summary.csv`
+- **How to read it**:
+  - High mapping success means the axis gene lists are well represented on the rat array.
+  - If an axis has many unmapped genes, axis-level scores for that axis should be interpreted more cautiously.
+- **Why this matters biologically**: all downstream biology (DEGs, axis scoring, enrichment) relies on accurate **gene-level** measurements and correctly defined **axis gene sets**.
 
 ## Methods
 
