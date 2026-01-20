@@ -1,20 +1,22 @@
 # =============================================================================
-# Script 06: Module Preservation Analysis
-# =============================================================================
+# HA Axis Validation Study — Script 06: Module Preservation Analysis
+# -----------------------------------------------------------------------------
+# Purpose: Test preservation of BI/SCI WGCNA modules in implant data.
+# Inputs:  Gene expression and manuscript-derived module definitions
+# Outputs: Module preservation statistics and eigengene summaries (see docs/06_module_preservation.md)
 #
-# Purpose: Test preservation of BI/SCI WGCNA modules in implant data
-#
-# Input:  Gene expression, module definitions from manuscript
-# Output: Module preservation statistics, eigengene correlations
-#
+# Author: Dr.-Ing Kevin Joseph
+# Group Leader - Laboratory of NeuroEngineering
+# Department of Neurosurgery
+# Medical Center - University of Freiburg
 # =============================================================================
 
 library(tidyverse)
 library(WGCNA)
 library(RColorBrewer)
 
-source("analysis/config.R")
-source("analysis/R/theme_publication.R")
+source("scripts/config.R")
+source("scripts/theme_publication.R")
 
 # Enable multi-threading for WGCNA
 allowWGCNAThreads()
@@ -196,8 +198,8 @@ for (mod in names(all_modules)) {
     if (length(implant) != length(control)) next
     if (any(is.na(implant)) || any(is.na(control))) next
     
-    # Paired t-test
-    test <- t.test(implant, control, paired = TRUE)
+    # Unpaired t-test (independent samples; no within-animal pairing available)
+    test <- t.test(implant, control, paired = FALSE)
     
     row <- data.frame(
       module = mod,

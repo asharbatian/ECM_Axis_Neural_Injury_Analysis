@@ -1,22 +1,28 @@
 # =============================================================================
-# Script 05: Temporal Dynamics and Chronic Analysis
-# =============================================================================
+# HA Axis Validation Study — Script 05: Temporal Dynamics and Chronic Analysis
+# -----------------------------------------------------------------------------
+# Purpose: Analyze temporal patterns of ECM axis engagement and classify persistent
+#          vs resolving vs late-emerging signatures across time.
+# Inputs:  DEG results and axis scores from prior scripts
+# Outputs: Temporal classification tables and summary metrics (see docs/05_temporal_dynamics.md)
 #
-# Purpose: Analyze temporal patterns of ECM axis engagement, identify
-#          persistent vs resolving vs late-emerging signatures
-#
-# This analysis EXTENDS beyond BI (7d max) and SCI (28d max) datasets
-#
-# Input:  DEG results, axis scores from previous scripts
-# Output: Temporal classification of genes and axes, biocompatibility metrics
-#
+# Author: Dr.-Ing Kevin Joseph
+# Group Leader - Laboratory of NeuroEngineering
+# Department of Neurosurgery
+# Medical Center - University of Freiburg
 # =============================================================================
 
 library(tidyverse)
 library(RColorBrewer)
 
-source("analysis/config.R")
-source("analysis/R/theme_publication.R")
+source("scripts/config.R")
+source("scripts/theme_publication.R")
+
+# Utility colors for plots
+colors_utility <- c(
+  significant = "#1B9E77",
+  nonsignificant = "grey80"
+)
 
 # -----------------------------------------------------------------------------
 # 1. Load Data

@@ -1,26 +1,23 @@
 # =============================================================================
-# Script 08: Main Figure Generation — HA-CENTRIC VALIDATION
-# =============================================================================
+# HA Axis Validation Study — Script 08: Figure Generation
+# -----------------------------------------------------------------------------
+# Purpose: Assemble analysis outputs into the main and supplementary figures,
+#          including HA-centric validation panels.
+# Inputs:  Results produced by scripts 01–07 (DEG, axis scoring, temporal, modules, GSEA)
+# Outputs: Publication-ready figures in figures/main/ and figures/supplementary/
+#          (see docs/08_figure_generation.md)
 #
-# This figure explicitly validates the manuscript's central thesis:
-#   "The Hyaluronan axis emerged as the central integrator of metabolic,
-#    structural, and immunologic remodeling"
-#
-# Each panel maps to a specific manuscript claim:
-#   A: HA Axis Ranks First (validates Table 2 - HA is #1 in BI, SCI, Implant)
-#   B: HA-DAMP Signaling Persistently Activated (LMW-HA → TLR → NF-κB)
-#   C: HA Receptor Genes Are DEGs (CD44, CD14, TLR4 - the DAMP sensors)
-#   D: Cross-Study Validation (Huff/Joseph signatures - validates Section 3.4)
-#   E: Temporal Resolution Supports Biocompatibility (88% resolving)
-#   F: BI/SCI Modules Preserved (validates WGCNA generalization)
-#
+# Author: Dr.-Ing Kevin Joseph
+# Group Leader - Laboratory of NeuroEngineering
+# Department of Neurosurgery
+# Medical Center - University of Freiburg
 # =============================================================================
 
 library(tidyverse)
 library(patchwork)
 
-source("analysis/config.R")
-source("analysis/R/theme_publication.R")
+source("scripts/config.R")
+source("scripts/theme_publication.R")
 
 main_fig_dir <- file.path(FIGURES_DIR, "main")
 supp_fig_dir <- file.path(FIGURES_DIR, "supplementary")

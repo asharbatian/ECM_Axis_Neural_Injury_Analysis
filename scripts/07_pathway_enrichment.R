@@ -1,15 +1,15 @@
 # =============================================================================
-# Script 11: Upstream Regulator and Pathway Analysis
-# =============================================================================
+# HA Axis Validation Study — Script 07: Pathway Enrichment
+# -----------------------------------------------------------------------------
+# Purpose: Test enrichment of HA- and ECM-related pathways and validate literature
+#          signatures supporting HA as a mechanistic driver.
+# Inputs:  DEG results and ECM axis gene sets (from prior scripts)
+# Outputs: GSEA/enrichment result tables and plots (see docs/07_pathway_enrichment.md)
 #
-# Purpose: Demonstrate that HA-related pathways are enriched upstream of
-#          the inflammatory response, supporting HA as mechanistic driver
-#
-# Analyses:
-#   - GSEA with literature implant signatures
-#   - GO/KEGG enrichment focused on HA-related terms
-#   - Pathway-level visualization
-#
+# Author: Dr.-Ing Kevin Joseph
+# Group Leader - Laboratory of NeuroEngineering
+# Department of Neurosurgery
+# Medical Center - University of Freiburg
 # =============================================================================
 
 library(tidyverse)
@@ -21,16 +21,17 @@ library(org.Rn.eg.db)
 select <- dplyr::select
 filter <- dplyr::filter
 
-source("analysis/config.R")
-source("analysis/R/theme_publication.R")
+source("scripts/config.R")
+source("scripts/theme_publication.R")
 
 ha_dir <- file.path(RESULTS_DIR, "ha_analysis")
+dir.create(ha_dir, recursive = TRUE, showWarnings = FALSE)
 
 # -----------------------------------------------------------------------------
 # 1. Load Data
 # -----------------------------------------------------------------------------
 
-cat("=== Script 11: Upstream Regulator Analysis ===\n\n")
+cat("=== Script 07: Pathway Enrichment ===\n\n")
 cat("1. Loading data...\n")
 
 # Load DEG results
@@ -268,7 +269,7 @@ if (length(interesting) > 0) {
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
   
   save_publication_figure(p_gsea_heatmap, 
-                          file.path(FIGURES_DIR, "individual", "11_gsea_heatmap"),
+                          file.path(FIGURES_DIR, "individual", "07_gsea_heatmap"),
                           width = 9, height = 7)
 }
 
@@ -305,7 +306,7 @@ if (nrow(ha_traj) > 0) {
     theme(legend.position = "bottom")
   
   save_publication_figure(p_ha_traj, 
-                          file.path(FIGURES_DIR, "individual", "11_ha_pathway_trajectory"),
+                          file.path(FIGURES_DIR, "individual", "07_ha_pathway_trajectory"),
                           width = 8, height = 5)
 }
 
@@ -326,7 +327,7 @@ upstream_results <- list(
 saveRDS(upstream_results, file.path(ha_dir, "upstream_regulator_results.rds"))
 write_csv(gsea_all, file.path(ha_dir, "gsea_all_results.csv"))
 
-cat("\n=== Script 11 Complete ===\n")
+cat("\n=== Script 07 Complete ===\n")
 
 # Print key summary
 cat("\nKEY FINDINGS:\n")

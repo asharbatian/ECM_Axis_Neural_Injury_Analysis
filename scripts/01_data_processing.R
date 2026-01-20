@@ -1,20 +1,22 @@
 # =============================================================================
-# Script 01: Data Processing and Quality Control
-# =============================================================================
-# 
-# Purpose: Load CEL files, normalize with RMA, perform QC, create metadata
+# HA Axis Validation Study — Script 01: Data Processing and Quality Control
+# -----------------------------------------------------------------------------
+# Purpose: Load CEL files, normalize with RMA, perform QC, and create metadata.
+# Inputs:  CEL files in Data/arrays/Controls/ and Data/arrays/Implants/
+# Outputs: Normalized expression matrix and sample metadata (see docs/01_data_processing.md)
 #
-# Input:  CEL files from Data/arrays/Controls/ and Data/arrays/Implants/
-# Output: Normalized expression matrix and sample metadata
-#
+# Author: Dr.-Ing Kevin Joseph
+# Group Leader - Laboratory of NeuroEngineering
+# Department of Neurosurgery
+# Medical Center - University of Freiburg
 # =============================================================================
 
 library(tidyverse)
 library(oligo)
 library(limma)
 
-source("analysis/config.R")
-source("analysis/R/theme_publication.R")
+source("scripts/config.R")
+source("scripts/theme_publication.R")
 
 # -----------------------------------------------------------------------------
 # 1. Load CEL files
@@ -109,8 +111,10 @@ metadata <- data.frame(
 metadata$day <- TIMEPOINT_MAP[metadata$timepoint]
 metadata$day[metadata$timepoint == "Control"] <- NA
 
-# Create animal ID for pairing (same replicate number = same animal)
-metadata$animal_id <- paste0(metadata$timepoint, "_", metadata$replicate)
+## NOTE (unpaired analysis):
+## Animal identity is not tracked across implant/control due to randomization.
+## The `replicate` number is treated only as a sample index within a timepoint,
+## not a biological pairing variable.
 
 # Clean up column names
 colnames(expr_matrix) <- metadata$sample_id

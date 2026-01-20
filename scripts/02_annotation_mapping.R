@@ -1,12 +1,14 @@
 # =============================================================================
-# Script 02: Ortholog Mapping and Gene Annotation
-# =============================================================================
+# HA Axis Validation Study — Script 02: Ortholog Mapping and Gene Annotation
+# -----------------------------------------------------------------------------
+# Purpose: Map mouse ECM axis genes to rat orthologs and annotate Clariom S probes.
+# Inputs:  Mouse gene sets (manuscript Table 1 or equivalent in-script definitions)
+# Outputs: Rat ortholog gene sets and probe-to-gene mapping (see docs/02_annotation_mapping.md)
 #
-# Purpose: Map mouse ECM axis genes to rat orthologs, annotate Clariom S probes
-#
-# Input:  Mouse gene sets from manuscript Table 1
-# Output: Rat ortholog gene sets, probe-to-gene mapping
-#
+# Author: Dr.-Ing Kevin Joseph
+# Group Leader - Laboratory of NeuroEngineering
+# Department of Neurosurgery
+# Medical Center - University of Freiburg
 # =============================================================================
 
 library(tidyverse)
@@ -14,7 +16,7 @@ library(biomaRt)
 library(clariomsrattranscriptcluster.db)
 library(limma)
 
-source("analysis/config.R")
+source("scripts/config.R")
 
 # -----------------------------------------------------------------------------
 # 1. Define ECM Axes (Mouse Gene Symbols from Manuscript)

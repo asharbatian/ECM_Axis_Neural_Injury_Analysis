@@ -1,12 +1,14 @@
 # =============================================================================
-# Script 04: ECM Axis Scoring (GSVA/ssGSEA)
-# =============================================================================
+# HA Axis Validation Study — Script 04: ECM Axis Scoring (GSVA/ssGSEA)
+# -----------------------------------------------------------------------------
+# Purpose: Calculate per-sample enrichment scores for each ECM axis.
+# Inputs:  Gene-level expression and ECM axis gene sets
+# Outputs: ssGSEA scores and axis activation statistics (see docs/04_axis_scoring.md)
 #
-# Purpose: Calculate per-sample enrichment scores for each ECM axis
-#
-# Input:  Gene-level expression, ECM axis gene sets
-# Output: ssGSEA scores, axis activation statistics
-#
+# Author: Dr.-Ing Kevin Joseph
+# Group Leader - Laboratory of NeuroEngineering
+# Department of Neurosurgery
+# Medical Center - University of Freiburg
 # =============================================================================
 
 library(tidyverse)
@@ -14,8 +16,18 @@ library(GSVA)
 library(limma)
 library(RColorBrewer)
 
-source("analysis/config.R")
-source("analysis/R/theme_publication.R")
+source("scripts/config.R")
+source("scripts/theme_publication.R")
+
+# Axis color palette (for plots)
+colors_axes <- c(
+  Hyaluronan = "#1B9E77",
+  Provisional_Matrix = "#D95F02",
+  PNN_CSPG = "#7570B3",
+  Basement_Membrane = "#E7298A",
+  Proteases_Regulators = "#66A61E",
+  Crosslinking_Fibrosis = "#E6AB02"
+)
 
 # -----------------------------------------------------------------------------
 # 1. Load Data
@@ -74,8 +86,6 @@ metadata$group <- factor(paste(metadata$condition, metadata$timepoint, sep = "_"
 design <- model.matrix(~ 0 + group, data = metadata)
 colnames(design) <- levels(metadata$group)
 
-metadata$pair_id <- paste(metadata$timepoint, metadata$replicate, sep = "_")
-
 # Contrasts
 timepoints <- c("Week0", "Week1", "Week2", "Week4", "Week18")
 contrast_formulas <- sapply(timepoints, function(tp) {
@@ -84,9 +94,8 @@ contrast_formulas <- sapply(timepoints, function(tp) {
 contrasts <- makeContrasts(contrasts = contrast_formulas, levels = design)
 colnames(contrasts) <- timepoints
 
-# Fit model
-corfit <- duplicateCorrelation(ssgsea_scores, design, block = metadata$pair_id)
-fit <- lmFit(ssgsea_scores, design, block = metadata$pair_id, correlation = corfit$consensus)
+# Fit model (unpaired)
+fit <- lmFit(ssgsea_scores, design)
 fit2 <- contrasts.fit(fit, contrasts)
 fit2 <- eBayes(fit2)
 

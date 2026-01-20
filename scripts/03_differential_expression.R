@@ -1,7 +1,14 @@
 # =============================================================================
-# Script 03: Differential Expression Analysis
-# =============================================================================
-# Performs paired DEG analysis (Implant vs Control) at each timepoint using limma
+# HA Axis Validation Study — Script 03: Differential Expression Analysis
+# -----------------------------------------------------------------------------
+# Purpose: Perform unpaired DEG analysis (Implant vs Control) at each timepoint using limma.
+# Inputs:  Gene-level expression matrix and sample metadata from prior steps
+# Outputs: DEG tables and summaries (see docs/03_differential_expression.md)
+#
+# Author: Dr.-Ing Kevin Joseph
+# Group Leader - Laboratory of NeuroEngineering
+# Department of Neurosurgery
+# Medical Center - University of Freiburg
 # =============================================================================
 
 cat("=== Script 03: Differential Expression Analysis ===\n")
@@ -11,8 +18,25 @@ suppressPackageStartupMessages({
   library(tidyverse)
 })
 
-source("analysis/config.R")
-source("analysis/R/theme_publication.R")
+source("scripts/config.R")
+source("scripts/theme_publication.R")
+
+# -----------------------------------------------------------------------------
+# Output directories
+# -----------------------------------------------------------------------------
+deg_dir <- file.path(RESULTS_DIR, "deg")
+fig_individual_dir <- file.path(FIGURES_DIR, "individual")
+fig_supp_dir <- file.path(FIGURES_DIR, "supplementary")
+dir.create(deg_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(fig_individual_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(fig_supp_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Color palette for DEG direction plots
+colors_direction <- c(
+  Up = "#B2182B",
+  Down = "#2166AC",
+  NS = "grey80"
+)
 
 # =============================================================================
 # 1. Load Data
@@ -37,12 +61,12 @@ cat("  Expression matrix:", nrow(expr_gene), "genes x", ncol(expr_gene), "sample
 cat("  Timepoints:", paste(levels(metadata$timepoint), collapse = ", "), "\n")
 
 # =============================================================================
-# 2. Build Design Matrix for Paired Analysis
+# 2. Build Design Matrix (Unpaired Analysis)
 # =============================================================================
-cat("\n2. Setting up paired design matrix...\n")
+cat("\n2. Setting up unpaired design matrix...\n")
 
-# Design: ~0 + group + animal_id (blocking on animal for paired design)
-design <- model.matrix(~ 0 + group + animal_id, data = metadata)
+# Design: ~0 + group (independent samples; no repeated-measures term)
+design <- model.matrix(~ 0 + group, data = metadata)
 colnames(design) <- make.names(colnames(design))
 
 # Simplify group names
@@ -92,6 +116,11 @@ for (tp in colnames(contrast_matrix)) {
     rownames_to_column("gene") %>%
     mutate(
       timepoint = tp,
+      direction_fdr = case_when(
+        adj.P.Val < DE_PADJ_THRESHOLD & logFC > 0 ~ "Up",
+        adj.P.Val < DE_PADJ_THRESHOLD & logFC < 0 ~ "Down",
+        TRUE ~ "NS"
+      ),
       direction = case_when(
         adj.P.Val < DE_PADJ_THRESHOLD & logFC > DE_LFC_THRESHOLD ~ "Up",
         adj.P.Val < DE_PADJ_THRESHOLD & logFC < -DE_LFC_THRESHOLD ~ "Down",
@@ -104,19 +133,81 @@ for (tp in colnames(contrast_matrix)) {
   # Summary stats
   n_up <- sum(res$direction == "Up")
   n_down <- sum(res$direction == "Down")
+
+  n_up_fdr <- sum(res$direction_fdr == "Up")
+  n_down_fdr <- sum(res$direction_fdr == "Down")
   
   deg_summary <- bind_rows(deg_summary, data.frame(
     timepoint = tp,
     n_up = n_up,
     n_down = n_down,
-    n_total = n_up + n_down
+    n_total = n_up + n_down,
+    n_up_fdr = n_up_fdr,
+    n_down_fdr = n_down_fdr,
+    n_total_fdr = n_up_fdr + n_down_fdr
   ))
   
-  # Save individual results
-  write.csv(res, file.path(RESULTS_DIR, "deg", paste0("deg_", tp, ".csv")), row.names = FALSE)
+  # Save per-timepoint results (all genes + significant subset)
+  write.csv(res, file.path(deg_dir, paste0("deg_all_", tp, ".csv")), row.names = FALSE)
+
+  res_sig <- res %>%
+    filter(adj.P.Val < DE_PADJ_THRESHOLD, abs(logFC) >= DE_LFC_THRESHOLD)
+  write.csv(res_sig, file.path(deg_dir, paste0("deg_significant_", tp, ".csv")), row.names = FALSE)
   
   cat(sprintf("  %s: %d up, %d down (total: %d DEGs)\n", tp, n_up, n_down, n_up + n_down))
 }
+
+# =============================================================================
+# 4b. ECM axis enrichment among DEGs (per timepoint)
+# =============================================================================
+cat("\n4b. Calculating ECM axis enrichment among significant DEGs...\n")
+
+ecm_axes_rat <- readRDS(file.path(RESULTS_DIR, "reference/ecm_axes_rat.rds"))
+all_genes_universe <- rownames(expr_gene)
+
+axis_enrichment <- list()
+for (tp in names(deg_results)) {
+  res <- deg_results[[tp]]
+  sig_genes <- res %>%
+    filter(adj.P.Val < DE_PADJ_THRESHOLD, abs(logFC) >= DE_LFC_THRESHOLD) %>%
+    pull(gene) %>%
+    unique()
+
+  for (axis in names(ecm_axes_rat)) {
+    axis_genes <- unique(ecm_axes_rat[[axis]])
+
+    # 2x2 table:
+    # in_axis & sig, in_axis & not_sig, not_in_axis & sig, not_in_axis & not_sig
+    in_axis <- all_genes_universe %in% axis_genes
+    is_sig <- all_genes_universe %in% sig_genes
+
+    a <- sum(in_axis & is_sig)
+    b <- sum(in_axis & !is_sig)
+    c <- sum(!in_axis & is_sig)
+    d <- sum(!in_axis & !is_sig)
+
+    ft <- fisher.test(matrix(c(a, b, c, d), nrow = 2))
+    expected <- ((a + b) * (a + c)) / (a + b + c + d)
+    fold_enrichment <- ifelse(expected > 0, a / expected, NA_real_)
+
+    axis_enrichment[[length(axis_enrichment) + 1]] <- data.frame(
+      timepoint = tp,
+      axis = axis,
+      overlap = a,
+      overlap_genes = paste(sort(intersect(axis_genes, sig_genes)), collapse = ","),
+      fold_enrichment = fold_enrichment,
+      p_value = unname(ft$p.value),
+      stringsAsFactors = FALSE
+    )
+  }
+}
+
+axis_enrichment <- bind_rows(axis_enrichment) %>%
+  group_by(timepoint) %>%
+  mutate(adj_p_value = p.adjust(p_value, method = "BH")) %>%
+  ungroup()
+
+write_csv(axis_enrichment, file.path(deg_dir, "axis_enrichment.csv"))
 
 # =============================================================================
 # 5. Create Volcano Plots
