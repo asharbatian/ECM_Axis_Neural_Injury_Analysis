@@ -1,37 +1,93 @@
-# HA Axis Validation Study — Neural Implant Transcriptomics (Paper Companion)
+# ECM Axis in Neural Injury and Implant Response
 
-## What this repository is
+Analysis scripts for the study: **"ECM-DAMP Signaling in Neural Injury and Implant Tissue Response"**
 
-This repository is a **paper companion** that reproduces the core transcriptomic analyses used to test whether **extracellular matrix (ECM) remodeling “axes”**—identified previously in **brain injury (BI)** and **spinal cord injury (SCI)**—are also engaged after **flexible neural probe implantation**.
+This repository contains both **discovery** (BI/SCI) and **validation** (neural implant) analysis pipelines.
 
-If you are here to **understand the paper**, start with:
+---
 
-- **Main figure (compiled)**: `figures/main/Figure_Main.pdf`
-- **Supplementary figures**: `figures/supplementary/`
-- **Key result tables**: `results/` (subfolders described below)
+## Contributors
 
-## Biological question
+| Analysis | Author | Folder |
+|----------|--------|--------|
+| Discovery (BI/SCI) | Ali Sharbatian | `discovery/` |
+| Validation (Neural Implant) | Kevin Joseph | `scripts/` |
 
-Neural implants trigger a foreign body response (FBR) that can compromise device performance over time. Here, we ask:
+---
 
+## Repository Structure
+```
+.
+├── discovery/                   # Discovery Analysis (BI/SCI)
+│   ├── BI/                      # Brain Injury scripts
+│   │   ├── 01_bi_fetch_preprocess.R
+│   │   ├── 02_bi_wgcna.R
+│   │   ├── 03_bi_diffexpr_gsea.R
+│   │   └── 04_bi_visualizations.R
+│   └── SCI/                     # Spinal Cord Injury scripts
+│       ├── 01_sci_fetch_preprocess.R
+│       ├── 02_sci_wgcna.R
+│       ├── 03_sci_diffexpr_gsea.R
+│       └── 04_sci_visualizations.R
+├── scripts/                     # Validation Analysis (Neural Implant)
+│   ├── 01_data_processing.R
+│   ├── 02_annotation_mapping.R
+│   ├── 03_differential_expression.R
+│   ├── 04_axis_scoring.R
+│   ├── 05_temporal_dynamics.R
+│   ├── 06_module_preservation.R
+│   ├── 07_pathway_enrichment.R
+│   ├── config.R
+│   └── theme_publication.R
+├── docs/                        # Script documentation
+├── results/                     # Generated outputs [created by scripts]
+└── figures/                     # Generated plots [created by scripts]
+```
+
+---
+
+## Part 1: Discovery Analysis (BI/SCI)
+
+WGCNA and pathway analysis to identify ECM axes in neural injury models.
+
+### Data Sources
+| Dataset | Model | Platform |
+|---------|-------|----------|
+| GSE35338 | Brain Injury (MCAO) | Affymetrix Mouse 430 2.0 |
+| GSE5296 | Spinal Cord Injury | Affymetrix Mouse 430 2.0 |
+
+### Software (R 4.4.2)
+```
+WGCNA 1.73, limma 3.62.1, GEOquery 2.74.0, fgsea 1.32.2,
+clusterProfiler 4.14.4, org.Mm.eg.db 3.20.0
+```
+
+### Running Discovery Analysis
+```bash
+# Brain Injury
+Rscript discovery/BI/01_bi_fetch_preprocess.R
+Rscript discovery/BI/02_bi_wgcna.R
+Rscript discovery/BI/03_bi_diffexpr_gsea.R
+Rscript discovery/BI/04_bi_visualizations.R
+
+# Spinal Cord Injury
+Rscript discovery/SCI/01_sci_fetch_preprocess.R
+Rscript discovery/SCI/02_sci_wgcna.R
+Rscript discovery/SCI/03_sci_diffexpr_gsea.R
+Rscript discovery/SCI/04_sci_visualizations.R
+```
+
+---
+
+## Part 2: Validation Analysis (Neural Implant)
+
+Testing whether ECM axes identified in BI/SCI are also engaged after neural probe implantation.
+
+### Biological Question
 - **Do the ECM axes (especially the Hyaluronan axis) activate after implantation?**
 - **How do those responses evolve over time** (acute → subacute → chronic)?
 
-Analysis of brain injury (BI) and spinal cord injury (SCI) transcriptomics identified six extracellular matrix (ECM) axes that define tissue remodeling phases:
-
-| Axis | Function |
-|------|----------|
-| **Hyaluronan** | HA synthesis/degradation, DAMP receptor signaling (CD44, TLR2/4) |
-| **Provisional Matrix** | Fibronectin/tenascin scaffold, integrin engagement |
-| **PNN-CSPG** | Perineuronal nets, chondroitin sulfate proteoglycans |
-| **Basement Membrane** | Laminin/collagen IV, blood-brain barrier |
-| **Proteases/Regulators** | MMPs, ADAMTSs, TIMPs |
-| **Crosslinking/Fibrosis** | LOX enzymes, fibrillar collagens |
-
-This pipeline quantifies those axes in implant vs contralateral control tissue across time, then summarizes findings in publication-ready figures.
-
-## Study Design
-
+### Study Design
 | Parameter | Value |
 |-----------|-------|
 | Species | Female Sprague-Dawley rats |
@@ -41,52 +97,27 @@ This pipeline quantifies those axes in implant vs contralateral control tissue a
 | Samples | n = 63 (31 implant, 32 control) |
 | Timepoints | Day 0 (4h), 7, 14, 28, 126 |
 
-## “What should I look at?” (paper-oriented guide)
-
-- **Axis-level activation across time**: `results/axis_scoring/axis_activation_stats.csv`
-- **Differential expression (per timepoint)**: `results/deg/deg_significant_Week*.csv`
-- **Pathway/gene set enrichment (including literature signatures)**: `results/ha_analysis/gsea_all_results.csv`
-- **Temporal pattern classes (resolving/persistent/late, etc.)**: `results/temporal/gene_temporal_classification.csv`
-- **Module-level summaries (module eigengenes / preservation-style summaries)**: `results/preservation/module_preservation_summary.csv`
-
-## Repository Structure
-
+### Software (R 4.3.0)
 ```
-.
-├── README.md                    # This file
-├── scripts/
-│   ├── 01_data_processing.R     # CEL file loading, RMA normalization, QC
-│   ├── 02_annotation_mapping.R  # Probe-to-gene mapping, ortholog translation
-│   ├── 03_differential_expression.R  # Unpaired limma analysis
-│   ├── 04_axis_scoring.R        # ssGSEA pathway scoring
-│   ├── 05_temporal_dynamics.R   # Gene temporal classification
-│   ├── 06_module_preservation.R # Module eigengene / preservation analysis
-│   ├── 07_pathway_enrichment.R  # fGSEA + literature signature validation
-│   ├── config.R                 # Shared paths/parameters used by scripts
-│   └── theme_publication.R      # Plot theme + save helper used by scripts
-├── docs/                        # Script documentation (inputs/outputs/methods)
-├── results/                     # Generated analysis outputs (.csv, .rds) [created by scripts]
-└── figures/                     # Generated plots (.pdf, .png) [created by scripts]
+oligo 1.62.2, limma 3.54.0, GSVA 1.46.0, fgsea 1.24.0,
+clusterProfiler, org.Rn.eg.db
 ```
 
-## Reproducing the analysis (01 → 08)
-
+### Running Validation Analysis
 The pipeline is **linear**: each script writes outputs used by the next script. Run them in order:
+```bash
+cd scripts/
+Rscript 01_data_processing.R      # CEL file loading, RMA normalization, QC
+Rscript 02_annotation_mapping.R   # Probe-to-gene mapping, ortholog translation
+Rscript 03_differential_expression.R  # Implant vs control DE at each timepoint
+Rscript 04_axis_scoring.R         # ssGSEA pathway scoring
+Rscript 05_temporal_dynamics.R    # Gene temporal classification
+Rscript 06_module_preservation.R  # Module eigengene / preservation analysis
+Rscript 07_pathway_enrichment.R   # fGSEA + literature signature validation
+```
 
-- **`scripts/01_data_processing.R`**: normalize microarray CEL files (RMA) + QC + sample metadata
-- **`scripts/02_annotation_mapping.R`**: map probes → genes; build gene-level matrix; create ECM gene sets
-- **`scripts/03_differential_expression.R`**: implant vs control differential expression at each timepoint
-- **`scripts/04_axis_scoring.R`**: compute axis scores per sample (ssGSEA) + stats across time
-- **`scripts/05_temporal_dynamics.R`**: classify genes/axes by temporal behavior across the full time course
-- **`scripts/06_module_preservation.R`**: module eigengene/activity summaries using manuscript-derived modules
-- **`scripts/07_pathway_enrichment.R`**: gene set enrichment and literature signature validation
-
-For step-by-step inputs/outputs, see `docs/` (one markdown page per script).
-
-## Data requirements (what you need to provide)
-
+### Data Requirements (Validation)
 This pipeline expects **raw Affymetrix CEL files** arranged as below:
-
 ```
 Data/arrays/
 ├── Controls/
@@ -100,52 +131,58 @@ Data/arrays/
     └── [same structure]
 ```
 
-## Running the Pipeline (R packages)
+### "What should I look at?" (paper-oriented guide)
+- **Axis-level activation across time**: `results/axis_scoring/axis_activation_stats.csv`
+- **Differential expression (per timepoint)**: `results/deg/deg_significant_Week*.csv`
+- **Pathway/gene set enrichment**: `results/ha_analysis/gsea_all_results.csv`
+- **Temporal pattern classes**: `results/temporal/gene_temporal_classification.csv`
+- **Module-level summaries**: `results/preservation/module_preservation_summary.csv`
 
-### Prerequisites
+### Key Outputs
+| Folder | Contents |
+|--------|----------|
+| `results/deg/` | Differential expression results |
+| `results/axis_scoring/` | ssGSEA scores and statistics |
+| `results/ha_analysis/` | Pathway enrichment results |
+| `results/temporal/` | Gene classification |
+| `results/preservation/` | Module preservation |
+| `figures/individual/` | Individual plots from each script |
+| `figures/supplementary/` | QC, all axes, GSEA heatmaps |
 
-```r
-# Bioconductor packages
-BiocManager::install(c(
-  "oligo", "pd.clariom.s.rat", "clariomsrattranscriptcluster.db",
-  "limma", "GSVA", "fgsea", "clusterProfiler", "org.Rn.eg.db"
-))
+---
 
-# CRAN packages
-install.packages(c("tidyverse", "patchwork", "pheatmap"))
-```
+## ECM Axes Analyzed
 
-### Execution
+| Axis | Function | Key Genes |
+|------|----------|-----------|
+| **Hyaluronan** | HA synthesis/degradation, DAMP signaling (CD44, TLR2/4) | Has1-3, Cd44, Tlr2, Tlr4, Cd14 |
+| **Provisional Matrix** | Fibronectin/tenascin scaffold, integrin engagement | Fn1, Tnc, Itga5, Itgb1 |
+| **PNN-CSPG** | Perineuronal nets, chondroitin sulfate proteoglycans | Acan, Bcan, Vcan, Tnr |
+| **Basement Membrane** | Laminin/collagen IV, blood-brain barrier | Hspg2, Lama4, Col4a1, Col4a2 |
+| **Proteases/Regulators** | MMPs, ADAMTSs, TIMPs | Adamts4, Adamts5, Mmp9, Timp1 |
+| **Crosslinking/Fibrosis** | LOX enzymes, fibrillar collagens | Lox, Loxl2, Col1a1, Tgm2 |
 
-Scripts must be run in order (01 → 08) as each depends on outputs from previous scripts.
-
-## Outputs
-
-### Main Figure plots
-- `figures/individual/` -  individual plots from each script
-
-### Supplementary Figure plots
-- `figures/supplementary/` — QC, all axes, GSEA heatmaps
-
-### Data Tables
-- `results/deg/` — Differential expression results
-- `results/axis_scoring/` — ssGSEA scores and statistics
-- `results/ha_analysis/` — Pathway enrichment results
-- `results/temporal/` — Gene classification
-- `results/preservation/` — Module preservation
+---
 
 ## Documentation
 
 See `docs/` for detailed documentation of each script, including inputs, outputs, and methods.
 
-## Glossary (quick definitions)
+---
 
-- **DEG**: differentially expressed gene (implant vs control)
-- **FDR**: false discovery rate (multiple testing-adjusted p-value)
-- **logFC**: log2 fold change (positive = higher in implant)
-- **ssGSEA / axis score**: per-sample gene set score summarizing coordinated expression of an axis
-- **NES**: normalized enrichment score from gene set enrichment analysis (fGSEA)
+## Glossary
+
+- **DEG**: Differentially expressed gene (implant vs control)
+- **FDR**: False discovery rate (multiple testing-adjusted p-value)
+- **logFC**: Log2 fold change (positive = higher in implant)
+- **ssGSEA / axis score**: Per-sample gene set score summarizing coordinated expression of an axis
+- **NES**: Normalized enrichment score from gene set enrichment analysis (fGSEA)
+- **WGCNA**: Weighted gene co-expression network analysis
+
+---
 
 ## License
 
 MIT License
+
+Copyright (c) 2025 Ali Sharbatian, Kevin Joseph
