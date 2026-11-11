@@ -37,7 +37,7 @@ Primary meta-analysis (k = 3 cohorts, `results/meta_primary_contrasts.csv`):
 | HA degradation | 1.7 | 0.06 |
 | PNN/CSPG | -1.2 | 0.89 |
 
-HA-axis z is positive in **every one of 11 contrasts**, including late SCI (D56, GSE45006).
+HA-axis z is positive and one-sided p<0.05 in **all 10 contrasts**, including late SCI (D56, GSE45006).
 Figures: `results/fig1_axis_heatmap.png`, `results/fig2_HA_axis_by_contrast.png`.
 
 ## What this does and does NOT support (read before citing)
