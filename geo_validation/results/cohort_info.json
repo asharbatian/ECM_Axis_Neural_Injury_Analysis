@@ -1,0 +1,45 @@
+{
+  "GSE45006": {
+    "organism": "rat",
+    "tissue": "spinal cord",
+    "model": "clip impact-compression",
+    "qc": "",
+    "n_genes": 16323,
+    "n_samples_used": 24,
+    "groups": {
+      "D56": 4,
+      "sham": 4,
+      "D14": 4,
+      "D7": 4,
+      "D1": 4,
+      "D3": 4
+    }
+  },
+  "GSE47681": {
+    "organism": "mouse",
+    "tissue": "thoracic spinal cord",
+    "model": "contusion, WT only",
+    "qc": "excluded label-conflict samples: GSM1154530(DAY1WT biological replicate 1|time: Day 7); GSM1154541(DAY1WT biological replicate 2|time: control)",
+    "n_genes": 22589,
+    "n_samples_used": 15,
+    "groups": {
+      "D3": 4,
+      "D7": 4,
+      "sham": 4,
+      "D1": 3
+    }
+  },
+  "GSE45997": {
+    "organism": "rat",
+    "tissue": "brain (ipsilateral)",
+    "model": "unilateral TBI",
+    "qc": "",
+    "n_genes": 16323,
+    "n_samples_used": 9,
+    "groups": {
+      "TBI_ipsi": 3,
+      "contra": 3,
+      "naive": 3
+    }
+  }
+}
