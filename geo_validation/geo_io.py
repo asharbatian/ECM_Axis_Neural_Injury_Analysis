@@ -1,7 +1,8 @@
 import requests,gzip,io,os,re,pandas as pd
 H="https://ftp.ncbi.nlm.nih.gov/geo/"
 C="geo_cache"; os.makedirs(C,exist_ok=True)
-def _stub(a): return a[:-3]+"nnn"
+def _stub(a):
+    pre = "GSE" if a.startswith("GSE") else "GPL"; return pre + a[3:-3] + "nnn"
 def fetch(url,fn):
     p=os.path.join(C,fn)
     if not os.path.exists(p):
@@ -32,7 +33,7 @@ def pheno(meta,acc_cols):
         df[f"char{i}"]=ch
     return df
 def platform(gpl):
-    stub=gpl[:-3]+"nnn"
+    stub=_stub(gpl)
     for kind,fn in [("annot",f"{gpl}.annot.gz"),("soft",f"{gpl}_family.soft.gz")]:
         try:
             url=f"{H}platforms/{stub}/{gpl}/{kind}/{fn}"
