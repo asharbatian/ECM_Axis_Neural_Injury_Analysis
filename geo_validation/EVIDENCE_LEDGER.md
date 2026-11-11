@@ -92,3 +92,21 @@ induce CEMIP/HYAL/CD44 in stromal cells, so the coupling is equally compatible w
 * Only partial-r and null-z summarize D2; per-cohort significance is limited (n=10-165 and a wide null in small cohorts: injury n=6-8).
 * Expression is bulk tissue: cell-type composition beyond the LEUK adjustment (fibroblasts, endothelium) can still drive the coupling.
 * Mouse/rat symbols mapped by upper-cased gene symbol; platform differences (Affymetrix, Agilent, Illumina) are not harmonised.
+
+---
+# Part 3 - per-gene breakdown of the receptor arm (CD44, CD14, TLR2, TLR4) - EXPLORATORY
+Decomposition of the pre-registered SENSE module; the gene-level split itself was NOT pre-registered. `run_damp_receptors.py`,
+`results/damp_receptor_genes.csv`, `results/damp_receptor_genes_pooled.csv`. Same 10 primary cohorts.
+
+| Gene | Cohorts up (q<0.05) / down | Pooled partial r with DAMP given leukocytes [95% CI] | I2 | null-z |
+|---|---|---|---|---|
+| CD44 | 3 / **2** (down in psoriasis, bladder cancer) | **0.27 [0.12, 0.41]** | 64% | 3.5 |
+| TLR2 | 4 / **0** (never down) | **0.23 [0.11, 0.35]** | 41% | 2.0 |
+| TLR4 | 4 / 2 | 0.15 [0.02, 0.28] | 50% | 1.1 |
+| CD14 | 5 / 1 | 0.13 [-0.04, 0.30] (CI includes 0) | 70% | 1.2 |
+
+Reading: the module-level signal is carried mainly by **CD44 and TLR2**; TLR4 and CD14 are weak/inconsistent. This agrees with the
+independent sorted-microglia result (E9: Cd44, Tlr2 up in microglia; Tlr4, Cd14 not). Caveats: CD44 and TLR2 are themselves NF-kB-inducible,
+so coupling with DAMP can mean the receptor is induced by inflammation rather than that HA fragments signal through it; all four bind
+many ligands (CD44: osteopontin etc.; TLR2/4: many DAMPs/PAMPs), so this is not HA-specific; heterogeneity is high (I2 41-70%);
+rat SCI shows negative CD14/TLR4 couplings (n=8, wide null).

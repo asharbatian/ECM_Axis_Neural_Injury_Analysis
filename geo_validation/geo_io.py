@@ -9,8 +9,14 @@ def fetch(url,fn):
         r=requests.get(url,timeout=300); r.raise_for_status(); open(p,"wb").write(r.content)
     return p
 def list_matrix(a):
-    r=requests.get(f"{H}series/{_stub(a)}/{a}/matrix/",timeout=60); r.raise_for_status()
-    return re.findall(r'href="([^"]+series_matrix\.txt\.gz)"',r.text)
+    cached = sorted(f for f in os.listdir(C) if f.startswith(a) and f.endswith("series_matrix.txt.gz"))
+    if cached: return cached                      # already downloaded: no network needed
+    for i in range(4):
+        try:
+            r=requests.get(f"{H}series/{_stub(a)}/{a}/matrix/",timeout=90); r.raise_for_status()
+            return re.findall(r'href="([^"]+series_matrix\.txt\.gz)"',r.text)
+        except Exception:
+            if i == 3: raise
 def series_matrix(a,fname=None):
     fname=fname or list_matrix(a)[0]
     p=fetch(f"{H}series/{_stub(a)}/{a}/matrix/{fname}",fname)
