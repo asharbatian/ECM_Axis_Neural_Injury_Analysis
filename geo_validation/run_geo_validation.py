@@ -37,13 +37,21 @@ HA_SUB = {  # sub-modules of the HA axis (same genes as above, just split)
 AXES_UP = {k: [x.upper() for x in v] for k, v in {**AXES, **HA_SUB}.items()}
 
 def gene_matrix(expr, gpl):
-    pl = g.platform(gpl)[["ID", "Gene symbol"]].dropna()
+    raw = g.platform(gpl)
+    import re as _re
+    sc = next((c for c in raw.columns if _re.fullmatch(r"(?i)gene[ _]?symbol|symbol", c)), None)
+    if sc is None and "gene_assignment" in raw.columns:          # e.g. Affymetrix ST arrays
+        raw["Gene symbol"] = raw["gene_assignment"].dropna().map(
+            lambda v: "///".join(x.split("//")[1].strip() for x in v.split("///") if len(x.split("//")) > 1))
+        sc = "Gene symbol"
+    if sc is None: raise RuntimeError(f"no gene-symbol column in {gpl}: {list(raw.columns)[:12]}")
+    pl = raw[["ID", sc]].rename(columns={sc: "Gene symbol"}).dropna()
     pl["Gene symbol"] = pl["Gene symbol"].str.split("///")
     pl = pl.explode("Gene symbol"); pl["Gene symbol"] = pl["Gene symbol"].str.strip().str.upper()
     pl = pl[pl["Gene symbol"] != ""]
     e = expr.copy()
     if np.nanmax(e.values) > 40: e = np.log2(e.clip(lower=1))      # raw-scale safeguard
-    e = e.dropna(how="all")
+    e = e.dropna(how="all"); e.index = e.index.astype(str)
     m = e.mean(axis=1)
     pl = pl[pl["ID"].isin(e.index)].assign(mu=lambda d: d["ID"].map(m))
     best = pl.sort_values("mu", ascending=False).drop_duplicates("Gene symbol")

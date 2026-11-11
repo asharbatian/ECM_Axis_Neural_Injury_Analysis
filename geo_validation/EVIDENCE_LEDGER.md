@@ -52,3 +52,43 @@ bulk-tissue composition) or it should be re-checked in the source dataset used f
 Disease cohorts from the review's Table 3 (e.g. IPF lung GSE47460/GSE32537 for HYAL/CD44/TLR; NAFLD liver GSE49541; OA),
 checkpoint-readout analysis (Treg/DC-maturation genes vs. HA-receptor arm over time), GSE80174 (rat LFPI, chronic, CD44),
 stroke (GSE32529).
+
+---
+# Part 2 - HA-fragmentation machinery vs innate DAMP response across diseases
+Pre-registered in `PREREGISTRATION_damp_diseases.md` (commit c919b2b, before any disease-cohort expression was inspected).
+Code `run_damp_diseases.py`; figure `results/fig4_damp_coupling.png`; tables `results/damp_*.csv`.
+Cohorts: IPF lung GSE53845, NASH liver GSE48452, OA synovium GSE55235 (RA reported separately), carotid atheroma GSE43292 (paired),
+psoriasis skin GSE13355, Alzheimer brain GSE5281 (region-demeaned), bladder cancer GSE13507 + SCI/TBI (3 cohorts) = 10 primary.
+
+| # | Prediction | Result | Verdict |
+|---|---|---|---|
+| D1a | DAMP innate program up in disease | Stouffer z=5.6 (8/10 cohorts positive); **8.9 if the synovium cohort is excluded** (see caveat) | **Supported**, strongest in injury and atheroma |
+| D1b | HA-receptor arm (SENSE) up | z=5.6 (8/10) | **Supported**, mostly injury cohorts |
+| D1c | FRAG (HYAL1/2, CEMIP, TMEM2) up | z=2.1 (9/10 z>0), but **IPF is significantly DOWN (z=-2.5)** | **Weak / partly supported**; effect size small |
+| D1d | SYNTH (HAS) | z=-1.1 (3/8 positive) | Not up - consistent with Part 1 |
+| D2 | FRAG co-varies with DAMP beyond leukocyte content and random gene sets | pooled partial r = **0.32 [0.22, 0.41]**, I2=27%; Stouffer z vs expression-matched null = 3.9; leave-one-out range 0.28-0.35; human-only (7) r=0.31; but only **4/10 cohorts individually p<0.05** | **Supported (modest)** |
+| D2b | SENSE~DAMP | r=0.32 [0.20,0.42], I2=41%; null-z=2.9; only 2/10 individually significant | Supported (modest) |
+| D4 | Innate specificity: ADAPT (T/B lymphocyte) genes should NOT couple to DAMP | ADAPT~DAMP r=-0.01 [-0.30,0.28], null-z=-1.6 | **Supported**: coupling is specific to the innate arm |
+| D4b | SYNTH negative control | r=0.20 [0.03,0.36], I2=73%, null-z=1.1 (n.s.) | Weak positive, not clean negative control |
+| D5 | Cross-disease: modules with larger FRAG effect have larger DAMP effect | Spearman 0.82 (SENSE 0.93) over 10 contrasts; **human-only n=7: 0.57 (SENSE 0.82)** | Exploratory only (effect sizes across studies are not comparable; n small) |
+
+## What this says about "HA fragments -> DAMP -> innate immunity"
+Supported at the transcript level: in several unrelated diseases, expression of the HA-fragmenting enzymes and the HA-fragment
+receptors rises with the innate TLR/MyD88/NF-kB program, this coupling is not explained by leukocyte content (LEUK-adjusted),
+exceeds random expression-matched gene sets, and is absent for adaptive-lymphocyte genes. This matches your reading that the
+fragment -> DAMP arm is an *innate* response.
+Not shown: (i) that fragments exist or have low molecular weight (not measurable here); (ii) direction - TNF/IL-1b strongly
+induce CEMIP/HYAL/CD44 in stromal cells, so the coupling is equally compatible with inflammation driving fragmentation
+(feed-forward loop) as with fragments driving inflammation; (iii) that HA is special - other stress/NF-kB-inducible genes could behave alike;
+(iv) the review's own caveat that endotoxin-free HA fragments may not activate TLRs (Dong 2016) is not addressed by expression data.
+
+## Part-2 caveats (disclosed)
+* **GSE55235 (synovium):** labels are correct (MMP1/MMP3 up in OA/RA, CXCL13 only in RA) yet DAMP is strongly LOWER in OA/RA
+  (z=-8.9 / -2.7) because immediate-early/stress genes (FOS, JUN, EGR1, NFKBIA, CXCL8, IL6) are higher in the "healthy" synovium,
+  probably a sampling/handling artifact. The primary result was kept as pre-specified; do not read this as evidence against DAMP in arthritis.
+* DAMP score contains stress/immediate-early-type genes, so tissue-procurement artifacts can bias D1 and D2.
+* IPF: FRAG is lower in disease, which does not fit "more fragmentation" (CEMIP/HYAL transcripts need gene-level follow-up).
+* RA shares controls with OA, so RA is reported but excluded from the pooled estimate.
+* Only partial-r and null-z summarize D2; per-cohort significance is limited (n=10-165 and a wide null in small cohorts: injury n=6-8).
+* Expression is bulk tissue: cell-type composition beyond the LEUK adjustment (fibroblasts, endothelium) can still drive the coupling.
+* Mouse/rat symbols mapped by upper-cased gene symbol; platform differences (Affymetrix, Agilent, Illumina) are not harmonised.
